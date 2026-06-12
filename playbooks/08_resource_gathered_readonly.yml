@@ -1,0 +1,24 @@
+---
+- name: Gather interface state as structured data
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Gather IOS interface resource state
+      cisco.ios.ios_interfaces:
+        state: gathered
+      register: gathered_interfaces
+
+    - name: Save gathered interface data as JSON
+      ansible.builtin.copy:
+        content: "{{ gathered_interfaces.gathered | to_nice_json }}\n"
+        dest: "outputs/{{ inventory_hostname }}_interfaces_gathered.json"
+      delegate_to: localhost
+
+    - name: Print first few gathered interface records
+      ansible.builtin.debug:
+        msg: "{{ gathered_interfaces.gathered[:5] }}"

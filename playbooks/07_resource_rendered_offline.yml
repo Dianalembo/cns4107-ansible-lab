@@ -1,0 +1,22 @@
+---
+- name: Render interface commands from structured data without touching the device
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Render IOS interface configuration from data model
+      cisco.ios.ios_interfaces:
+        config:
+          - name: Loopback150
+            description: CNS4107 resource module rendered example
+            enabled: true
+        state: rendered
+      register: rendered_interfaces
+
+    - name: Print rendered CLI commands
+      ansible.builtin.debug:
+        var: rendered_interfaces.rendered

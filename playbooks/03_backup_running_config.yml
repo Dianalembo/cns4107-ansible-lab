@@ -1,0 +1,27 @@
+---
+- name: Backup running configuration from IOS XE
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Ensure backup directory exists
+      ansible.builtin.file:
+        path: backups
+        state: directory
+      delegate_to: localhost
+
+    - name: Backup running configuration using ios_config
+      cisco.ios.ios_config:
+        backup: true
+        backup_options:
+          dir_path: backups
+          filename: "{{ inventory_hostname }}_running.cfg"
+      register: backup_result
+
+    - name: Show backup location
+      ansible.builtin.debug:
+        var: backup_result.backup_path

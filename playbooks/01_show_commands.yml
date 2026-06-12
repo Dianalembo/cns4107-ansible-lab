@@ -1,0 +1,22 @@
+---
+- name: Run read-only show commands on IOS XE
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Run key operational commands
+      cisco.ios.ios_command:
+        commands:
+          - show version
+          - show ip interface brief
+          - show running-config | include ^hostname|^ntp|^ip domain
+      register: show_output
+
+    - name: Print output command by command
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ show_output.stdout_lines }}"

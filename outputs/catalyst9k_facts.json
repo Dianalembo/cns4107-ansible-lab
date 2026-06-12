@@ -1,0 +1,20 @@
+{
+    "ansible_net_api": "cliconf",
+    "ansible_net_gather_network_resources": [],
+    "ansible_net_gather_subset": [
+        "default"
+    ],
+    "ansible_net_hostname": "Test1",
+    "ansible_net_image": "bootflash:packages.conf",
+    "ansible_net_iostype": "IOS-XE",
+    "ansible_net_model": "C9KV-UADP-8P",
+    "ansible_net_operatingmode": "controller",
+    "ansible_net_python_version": "3.12.3",
+    "ansible_net_serialnum": "98DVJUONW1X",
+    "ansible_net_stacked_serialnums": [
+        "98DVJUONW1X"
+    ],
+    "ansible_net_system": "ios",
+    "ansible_net_version": "17.15.01",
+    "ansible_network_resources": {}
+}

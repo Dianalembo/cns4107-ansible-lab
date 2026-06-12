@@ -1,0 +1,35 @@
+---
+- name: Gather IOS XE facts and save them locally
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Gather minimum IOS facts
+      cisco.ios.ios_facts:
+        gather_subset:
+          - min
+      register: facts_result
+
+    - name: Create local output directory
+      ansible.builtin.file:
+        path: outputs
+        state: directory
+      delegate_to: localhost
+
+    - name: Save facts as formatted JSON
+      ansible.builtin.copy:
+        content: "{{ facts_result.ansible_facts | to_nice_json }}\n"
+        dest: "outputs/{{ inventory_hostname }}_facts.json"
+      delegate_to: localhost
+
+    - name: Show selected facts
+      ansible.builtin.debug:
+        msg:
+          - "hostname : {{ facts_result.ansible_facts.ansible_net_hostname | default('unknown') }}"
+          - "model    : {{ facts_result.ansible_facts.ansible_net_model | default('unknown') }}"
+          - "version  : {{ facts_result.ansible_facts.ansible_net_version | default('unknown') }}"
+          - "serial   : {{ facts_result.ansible_facts.ansible_net_serialnum | default('unknown') }}"

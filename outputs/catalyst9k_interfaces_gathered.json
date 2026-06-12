@@ -1,0 +1,173 @@
+[
+    {
+        "description": "DO NOT TOUCH",
+        "enabled": true,
+        "name": "GigabitEthernet0/0"
+    },
+    {
+        "description": "RESTCONF_TEST_ACCESS",
+        "enabled": true,
+        "name": "GigabitEthernet1/0/1",
+        "service_policy": {
+            "input": "PM-QOS-ACCESS-IN"
+        }
+    },
+    {
+        "description": "ACCESS_IOT",
+        "enabled": true,
+        "name": "GigabitEthernet1/0/2",
+        "service_policy": {
+            "input": "PM-QOS-ACCESS-IN"
+        }
+    },
+    {
+        "description": "Oficina-101-Recepcion",
+        "enabled": true,
+        "name": "GigabitEthernet1/0/3",
+        "service_policy": {
+            "input": "PM-QOS-ACCESS-IN"
+        }
+    },
+    {
+        "description": "Oficina-102-Contabilidad",
+        "enabled": true,
+        "name": "GigabitEthernet1/0/4",
+        "service_policy": {
+            "input": "PM-QOS-ACCESS-IN"
+        }
+    },
+    {
+        "description": "DERIVA-INTRUSO",
+        "enabled": true,
+        "name": "GigabitEthernet1/0/5",
+        "service_policy": {
+            "input": "PM-QOS-ACCESS-IN"
+        }
+    },
+    {
+        "description": "Sala-Reuniones-Norte",
+        "enabled": true,
+        "name": "GigabitEthernet1/0/6",
+        "service_policy": {
+            "input": "PM-QOS-ACCESS-IN"
+        }
+    },
+    {
+        "description": "SW1 to SW2",
+        "enabled": true,
+        "name": "GigabitEthernet1/0/7",
+        "service_policy": {
+            "output": "PM-QOS-EGRESS"
+        }
+    },
+    {
+        "description": "Access-Point-Lobby",
+        "enabled": true,
+        "name": "GigabitEthernet1/0/8",
+        "service_policy": {
+            "output": "PM-QOS-EGRESS"
+        }
+    },
+    {
+        "description": "Configured via Python Automation",
+        "enabled": true,
+        "name": "Loopback100"
+    },
+    {
+        "description": "Anisble Rendered Loopback - Primary",
+        "enabled": true,
+        "name": "Loopback101"
+    },
+    {
+        "description": "Ansible Rendered Loopback - Secondary",
+        "enabled": true,
+        "name": "Loopback102"
+    },
+    {
+        "description": "RESTCONF Test",
+        "enabled": true,
+        "name": "Loopback200"
+    },
+    {
+        "enabled": true,
+        "name": "Vlan1"
+    },
+    {
+        "description": "CORP_USERS_GATEWAY",
+        "enabled": true,
+        "name": "Vlan10"
+    },
+    {
+        "description": "IOT_TRANSIT_TO_UPSTREAM_ROUTER",
+        "enabled": true,
+        "name": "Vlan102"
+    },
+    {
+        "description": "DMZ_TRANSIT_TO_UPSTREAM_ROUTER",
+        "enabled": true,
+        "name": "Vlan123"
+    },
+    {
+        "description": "VOICE_GATEWAY",
+        "enabled": true,
+        "name": "Vlan15"
+    },
+    {
+        "description": "IOT_GATEWAY",
+        "enabled": true,
+        "name": "Vlan18"
+    },
+    {
+        "description": "CORP_SERVERS_GATEWAY",
+        "enabled": true,
+        "name": "Vlan20"
+    },
+    {
+        "description": "DMZ_GATEWAY",
+        "enabled": true,
+        "name": "Vlan21"
+    },
+    {
+        "description": "GUEST_GATEWAY",
+        "enabled": true,
+        "name": "Vlan22"
+    },
+    {
+        "enabled": true,
+        "name": "Vlan222"
+    },
+    {
+        "description": "QUARANTINE_NO_ROUTING",
+        "enabled": false,
+        "name": "Vlan23"
+    },
+    {
+        "description": "AUTOMATION_GATEWAY",
+        "enabled": true,
+        "name": "Vlan346"
+    },
+    {
+        "description": "CORP_TRANSIT_TO_UPSTREAM_ROUTER",
+        "enabled": true,
+        "name": "Vlan54"
+    },
+    {
+        "description": "NETOPS_GATEWAY",
+        "enabled": true,
+        "name": "Vlan88"
+    },
+    {
+        "enabled": true,
+        "name": "Vlan888"
+    },
+    {
+        "description": "GUEST_TRANSIT_TO_UPSTREAM_ROUTER",
+        "enabled": true,
+        "name": "Vlan89"
+    },
+    {
+        "description": "NATIVE_BLACKHOLE_NO_ROUTING",
+        "enabled": false,
+        "name": "Vlan999"
+    }
+]

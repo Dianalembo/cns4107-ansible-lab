@@ -1,0 +1,28 @@
+---
+- name: Preflight checks for the Ansible WSL DevNet lab
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Show selected inventory variables
+      ansible.builtin.debug:
+        msg: >-
+          host={{ inventory_hostname }},
+          ansible_host={{ ansible_host | default('unknown') }},
+          connection={{ ansible_connection | default('unknown') }},
+          network_os={{ ansible_network_os | default('unknown') }},
+          lab_allow_changes={{ lab_allow_changes | default('unknown') }}
+
+    - name: Run a harmless IOS command
+      cisco.ios.ios_command:
+        commands:
+          - show clock
+      register: clock_output
+
+    - name: Display device clock output
+      ansible.builtin.debug:
+        var: clock_output.stdout_lines

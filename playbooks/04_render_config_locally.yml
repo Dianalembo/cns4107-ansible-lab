@@ -1,0 +1,49 @@
+---
+- name: Render IOS XE configuration locally from Jinja2 templates
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+    lab_loopbacks:
+      - name: Loopback150
+        description: CNS4107 Ansible lab loopback on Catalyst 9K - safe test
+        ip_address: 10.255.150.1
+        mask: 255.255.255.255
+    ntp_servers:
+      - 10.10.0.10
+      - 10.10.0.11
+    syslog_servers:
+      - 10.10.0.50
+    lab_banner: |
+      ************************************************************
+      This device is used for CNS4107 Ansible automation practice.
+      Running on Catalyst 9000 Always-On Sandbox infrastructure.
+      Do not make disruptive changes on shared sandboxes.
+      ************************************************************
+  tasks:
+    - name: Ensure rendered directory exists
+      ansible.builtin.file:
+        path: rendered
+        state: directory
+      delegate_to: localhost
+
+    - name: Render loopback configuration locally
+      ansible.builtin.template:
+        src: ../templates/loopbacks.j2
+        dest: "rendered/{{ inventory_hostname }}_loopbacks.cfg"
+      delegate_to: localhost
+
+    - name: Render management services configuration locally
+      ansible.builtin.template:
+        src: ../templates/management_services.j2
+        dest: "rendered/{{ inventory_hostname }}_management_services.cfg"
+      delegate_to: localhost
+
+    - name: Show where rendered files were created
+      ansible.builtin.debug:
+        msg:
+          - "rendered/{{ inventory_hostname }}_loopbacks.cfg"
+          - "rendered/{{ inventory_hostname }}_management_services.cfg"

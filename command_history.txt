@@ -1,0 +1,977 @@
+    1  wsl --list --verbose
+    2  exit
+    3  sudo apt update
+    4  sudo apt upgrade -y
+    5  sudo apt install -y python3 python3 - pip python3 - venv git curl jq sshpass
+    6  yamllint tree
+    7  sudo apt update && sudo apt install -y python3 python3-pip python3-venv git curl jq sshpass yamllint tree
+    8  mkdir -p ~/ cns4107
+    9  cd ~/ cns4107
+   10  mkdir ansible - wsl - devnet - lab
+   11  cd ansible - wsl - devnet - lab
+   12  mkdir -p ~/ cns4107
+   13  cd ~/ cns4107
+   14  mkdir ansible-wsl-devnet-lab
+   15  cd ansible-wsl-devnet-lab
+   16  mkdir -p ~/cns4107/ansible-wsl-devnet-lab
+   17  cd ~/cns4107/ansible-wsl-devnet-lab
+   18  tree
+   19  mkdir -p inventories group_vars host_vars playbooks templates roles outputs backups rendered reports
+   20  tree
+   21  python3 -m venv . venv
+   22  source . venv / bin / activate
+   23  python -m pip install -- upgrade pip wheel
+   24  python3 -m venv .venv
+   25  source .venv/bin/activate
+   26  pip install --upgrade pip wheel
+   27  pip install ansible-core ansible-pylibssh jmespath netaddr paramiko
+   28  ansible --version
+   29  ansible-galaxy collection install ansible.netcommon cisco.ios community.general
+   30  ansible-galaxy collection list | grep -E ’ ansible.netcommon | cisco.ios | community.general ’
+   31  ansible-galaxy collection list | grep -E 'netcommon|cisco\.ios|general'
+   32  mkdir -p inventories group_vars host_vars templates playbooks outputs backups rendered reports docs scripts
+   33  cat > requirements.txt <<'EOF'
+   34  ansible-core
+   35  ansible-pylibssh
+   36  jmespath
+   37  netaddr
+   38  paramiko
+   39  EOF
+   40  mkdir -p collections
+   41  cat > collections/requirements.yml <<'EOF'
+   42  ---
+   43  collections:
+   44    - name: ansible.netcommon
+   45    - name: cisco.ios
+   46    - name: community.general
+   47  EOF
+   48  ansible-galaxy collection install -r collections/requirements.yml
+   49  cat > ansible.cfg <<'EOF'
+   50  [defaults]
+   51  inventory = inventories/devnet.yml
+   52  host_key_checking = False
+   53  retry_files_enabled = False
+   54  timeout = 30
+   55  stdout_callback = yaml
+   56  bin_ansible_callbacks = True
+   57  interpreter_python = auto_silent
+   58  collections_path = ~/.ansible/collections:/usr/share/ansible/collections
+   59  [persistent_connection]
+   60  connect_timeout = 60
+   61  command_timeout = 60
+   62  EOF
+   63  tree
+   64  cat > inventories/devnet.yml <<'EOF'
+   65  all:
+   66    children:
+   67      iosxe:
+   68        hosts:
+   69          sandbox_iosxe:
+   70            ansible_host: sandbox-iosxe-latest-1.cisco.com
+   71            ansible_port: 22
+   72            ansible_user: admin
+   73            ansible_password: Cisco12345
+   74            ansible_become_password: Cisco12345
+   75            device_role: devnet_sandbox
+   76            site: cisco_devnet
+   77  EOF
+   78  cat > group_vars/iosxe.yml <<'EOF'
+   79  ansible_connection: ansible.netcommon.network_cli
+   80  ansible_network_os: cisco.ios.ios
+   81  ansible_become: true
+   82  ansible_become_method: enable
+   83  # Guardrail to prevent accidental modifications on shared public sandboxes
+   84  lab_allow_changes: false
+   85  # Structured intent data models
+   86  lab_owner: CNS4107
+   87  lab_prefix: CNS4107_ANSIBLE
+   88  ntp_servers:
+   89    - 10.10.0.10
+   90    - 10.10.0.11
+   91  syslog_servers:
+   92    - 10.10.0.50
+   93  lab_loopbacks:
+   94    - name: Loopback150
+   95      description: CNS4107 Ansible lab loopback - safe test
+   96      ip_address: 10.255.150.1
+   97      mask: 255.255.255.255
+   98  lab_banner: |
+   99    ************************************************************
+  100    This device is used for CNS4107 Ansible automation practice.
+  101    Do not make disruptive changes on shared sandboxes.
+  102    ************************************************************
+  103  EOF
+  104  cat > host_vars/sandbox_iosxe.yml <<'EOF'
+  105  ---
+  106  ansible_hostname_expected: sandbox-iosxe-latest-1.cisco.com
+  107  management_protocols:
+  108    ssh: 22
+  109    netconf: 830
+  110    restconf: 443
+  111  report_tags:
+  112    course: CNS4107
+  113    lab: ansible-wsl-devnet
+  114    environment: public-sandbox
+  115  EOF
+  116  # Graph your inventory topology
+  117  ansible-inventory --graph
+  118  # Verify that Ansible successfully merges the host and group variables together
+  119  ansible-inventory --host sandbox_iosxe --yaml
+  120  ansible sandbox_iosxe -m ansible.netcommon.net_ping
+  121  cat > ansible.cfg <<'EOF'
+  122  [defaults]
+  123  inventory = inventories/devnet.yml
+  124  host_key_checking = False
+  125  retry_files_enabled = False
+  126  timeout = 30
+  127  # Updated native formatting engine for ansible-core 2.13+
+  128  stdout_callback = default
+  129  bin_ansible_callbacks = True
+  130  result_format = yaml
+  131  interpreter_python = auto_silent
+  132  collections_path = ~/.ansible/collections:/usr/share/ansible/collections
+  133  [persistent_connection]
+  134  connect_timeout = 60
+  135  command_timeout = 60
+  136  EOF
+  137  ansible sandbox_iosxe -m ansible.netcommon.net_ping
+  138  ansible sandbox_iosxe -m cisco.ios.ios_command -a "commands='show clock'"
+  139  ansible sandbox_iosxe -m ansible.netcommon.net_ping -a "dest=8.8.8.8"
+  140  nano inventories/devnet.yml
+  141  ansible sandbox_iosxe -m cisco.ios.ios_command -a "commands='show clock'"
+  142  sudo apt update && sudo apt install -y python3 python3-pip python3-venv git curl jq sshpass yamllint tree
+  143  cd ~
+  144  python3 -m venv .venv
+  145  source .venv/bin/activate
+  146  pip install --upgrade pip wheel
+  147  pip install ansible-core ansible-pylibssh jmespath netaddr paramiko
+  148  ansible-galaxy collection install ansible.netcommon cisco.ios community.general
+  149  mkdir -p ~/cns4107/ansible-wsl-devnet-lab
+  150  cd ~/cns4107/ansible-wsl-devnet-lab
+  151  mkdir -p inventories group_vars host_vars templates playbooks outputs backups rendered reports docs scripts collections
+  152  cat > requirements.txt <<'EOF'
+ansible-core
+ansible-pylibssh
+jmespath
+netaddr
+paramiko
+EOF
+
+  153  cat > collections/requirements.yml <<'EOF'
+---
+collections:
+  - name: ansible.netcommon
+  - name: cisco.ios
+  - name: community.general
+EOF
+
+  154  cat > ansible.cfg <<'EOF'
+[defaults]
+inventory = inventories/devnet.yml
+host_key_checking = False
+retry_files_enabled = False
+timeout = 30
+stdout_callback = default
+bin_ansible_callbacks = True
+result_format = yaml
+deprecation_warnings = False
+interpreter_python = auto_silent
+collections_path = ~/.ansible/collections:/usr/share/ansible/collections
+
+[persistent_connection]
+connect_timeout = 60
+command_timeout = 60
+EOF
+
+  155  cat > inventories/devnet.yml <<'EOF'
+---
+all:
+  children:
+    iosxe:
+      hosts:
+        sandbox_iosxe:
+          ansible_host: sandbox-iosxe.cisco.com
+          ansible_port: 22
+          ansible_user: developer
+          ansible_password: Cisco12345
+          ansible_become_password: Cisco12345
+          device_role: devnet_sandbox
+          site: cisco_devnet
+EOF
+
+  156  cat > group_vars/iosxe.yml <<'EOF'
+---
+ansible_connection: ansible.netcommon.network_cli
+ansible_network_os: cisco.ios.ios
+ansible_become: true
+ansible_become_method: enable
+
+# Guardrail to protect shared public infrastructure
+lab_allow_changes: false
+
+# Updated Data models for Catalyst Environment
+lab_owner: CNS4107
+lab_prefix: CNS4107_CAT9K_ANSIBLE
+
+ntp_servers:
+  - 10.10.0.10
+  - 10.10.0.11
+
+syslog_servers:
+  - 10.10.0.50
+
+lab_loopbacks:
+  - name: Loopback150
+    description: CNS4107 Ansible lab loopback on Catalyst 9K - safe test
+    ip_address: 10.255.150.1
+    mask: 255.255.255.255
+
+lab_banner: |
+  ************************************************************
+  This device is used for CNS4107 Ansible automation practice.
+  Running on Catalyst 9000 Always-On Sandbox infrastructure.
+  Do not make disruptive changes on shared sandboxes.
+  ************************************************************
+EOF
+
+  157  cat > host_vars/sandbox_iosxe.yml <<'EOF'
+---
+ansible_hostname_expected: sandbox-iosxe.cisco.com
+management_protocols:
+  ssh: 22
+  netconf: 830
+  restconf: 443
+report_tags:
+  course: CNS4107
+  lab: ansible-wsl-devnet
+  environment: catalyst-9k-sandbox
+EOF
+
+  158  ansible-inventory --graph
+  159  ansible-inventory --host sandbox_iosxe --yaml
+  160  ansible sandbox_iosxe -m cisco.ios.ios_command -a "commands='show clock'"
+  161  clear
+  162  pip install ansible-core ansible-pylibssh jmespath netaddr paramiko
+  163  ansible --version
+  164  ansible-galaxy collection install ansible.netcommon cisco.ios community.general
+  165  mkdir -p inventories group_vars host_vars templates playbooks outputs backups rendered reports
+  166  mkdir -p docs scripts
+  167  cat > requirements.txt <<'EOF'
+ansible-core
+ansible-pylibssh
+jmespath
+netaddr
+paramiko
+EOF
+
+  168  mkdir -p collections
+  169  cat > collections/requirements.yml <<'EOF'
+---
+collections:
+  - name: ansible.netcommon
+  - name: cisco.ios
+  - name: community.general
+EOF
+
+  170  cat > ansible.cfg <<'EOF'
+[defaults]
+inventory = inventories/devnet.yml
+host_key_checking = False
+retry_files_enabled = False
+timeout = 30
+stdout_callback = yaml
+bin_ansible_callbacks = True
+interpreter_python = auto_silent
+collections_path = ~/.ansible/collections:/usr/share/ansible/collections
+
+[persistent_connection]
+connect_timeout = 60
+command_timeout = 60
+EOF
+
+  171  tree
+  172  cat > inventories/devnet.yml <<'EOF'
+---
+all:
+  children:
+    iosxe:
+      hosts:
+        catalyst9k:
+          ansible_host: devnetsandboxiosxec9k.cisco.com
+          ansible_port: 22
+          ansible_user: rehema.lembo
+          ansible_password: wPULJ_-0ir66t
+          ansible_become_password: wPULJ_-0ir66t
+          device_role: lab_switch
+          site: strathmore_lab
+EOF
+
+  173  cat > host_vars/catalyst9k.yml <<'EOF'
+---
+ansible_hostname_expected: devnetsandboxiosxec9k.cisco.com
+
+management_protocols:
+  ssh: 22
+  netconf: 830
+  restconf: 443
+
+report_tags:
+  course: CNS4107
+  lab: ansible-wsl-devnet
+  environment: devnet-catalyst9k
+EOF
+
+  174  ansible-inventory --graph
+  175  ansible-inventory --host catalyst9k --yaml
+  176  getent hosts devnetsandboxiosxec9k.cisco.com
+  177  nc -vz devnetsandboxiosxec9k.cisco.com 22
+  178  ssh rehema.lembo@devnetsandboxiosxec9k.cisco.com
+  179  ansible iosxe -m cisco.ios.ios_command -a "commands='show version'" -vv
+  180  cat > ansible.cfg <<'EOF'
+[defaults]
+inventory = inventories/devnet.yml
+host_key_checking = False
+retry_files_enabled = False
+timeout = 30
+stdout_callback = default
+result_format = yaml
+bin_ansible_callbacks = True
+interpreter_python = auto_silent
+collections_path = ~/.ansible/collections:/usr/share/ansible/collections
+
+[persistent_connection]
+connect_timeout = 60
+command_timeout = 60
+EOF
+
+  181  ansible iosxe -m cisco.ios.ios_command -a "commands='show version'" -vv
+  182  ansible iosxe -m cisco.ios.ios_command -a "commands='show ip interface brief'"
+  183  cat >> ansible.cfg <<'EOF'
+deprecation_warnings = False
+EOF
+
+  184  cat > playbooks/00_preflight.yml <<'EOF'
+---
+- name: Preflight checks for the Ansible WSL DevNet lab
+  hosts: iosxe
+  gather_facts: false
+  tasks:
+    - name: Show selected inventory variables
+      ansible.builtin.debug:
+        msg:
+          host: "{{ inventory_hostname }}"
+          ansible_host: "{{ ansible_host }}"
+          connection: "{{ ansible_connection }}"
+          network_os: "{{ ansible_network_os }}"
+          lab_allow_changes: "{{ lab_allow_changes }}"
+
+    - name: Run a harmless IOS command
+      cisco.ios.ios_command:
+        commands:
+          - show clock
+      register: clock_output
+
+    - name: Display device clock output
+      ansible.builtin.debug:
+        var: clock_output.stdout_lines
+EOF
+
+  185  ansible-playbook playbooks/00_preflight.yml
+  186  cat group_vars/iosxe.yml
+  187  ansible-inventory --graph
+  188  cat > inventories/devnet.yml <<'EOF'
+---
+all:
+  children:
+    iosxe:
+      hosts:
+        catalyst9k:
+          ansible_host: devnetsandboxiosxec9k.cisco.com
+          ansible_port: 22
+          ansible_user: rehema.lembo
+          ansible_password: wPULJ_-0ir66t
+          ansible_become_password: wPULJ_-0ir66t
+          device_role: lab_switch
+          site: strathmore_lab
+EOF
+
+  189  ansible-inventory --graph
+  190  ansible-inventory --host catalyst9k --yaml
+  191  cat > playbooks/00_preflight.yml <<'EOF'
+---
+- name: Preflight checks for the Ansible WSL DevNet lab
+  hosts: iosxe
+  gather_facts: false
+  tasks:
+    - name: Show selected inventory variables
+      ansible.builtin.debug:
+        msg: >-
+          host={{ inventory_hostname }},
+          ansible_host={{ ansible_host | default('unknown') }},
+          connection={{ ansible_connection | default('unknown') }},
+          network_os={{ ansible_network_os | default('unknown') }},
+          lab_allow_changes={{ lab_allow_changes | default('unknown') }}
+
+    - name: Run a harmless IOS command
+      cisco.ios.ios_command:
+        commands:
+          - show clock
+      register: clock_output
+
+    - name: Display device clock output
+      ansible.builtin.debug:
+        var: clock_output.stdout_lines
+EOF
+
+  192  ansible-playbook playbooks/00_preflight.yml
+  193  cat > playbooks/00_preflight.yml <<'EOF'
+---
+- name: Preflight checks for the Ansible WSL DevNet lab
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Show selected inventory variables
+      ansible.builtin.debug:
+        msg: >-
+          host={{ inventory_hostname }},
+          ansible_host={{ ansible_host | default('unknown') }},
+          connection={{ ansible_connection | default('unknown') }},
+          network_os={{ ansible_network_os | default('unknown') }},
+          lab_allow_changes={{ lab_allow_changes | default('unknown') }}
+
+    - name: Run a harmless IOS command
+      cisco.ios.ios_command:
+        commands:
+          - show clock
+      register: clock_output
+
+    - name: Display device clock output
+      ansible.builtin.debug:
+        var: clock_output.stdout_lines
+EOF
+
+  194  cat > group_vars/iosxe.yml <<'EOF'
+---
+ansible_connection: ansible.netcommon.network_cli
+ansible_network_os: cisco.ios.ios
+ansible_become: true
+ansible_become_method: enable
+lab_allow_changes: false
+lab_owner: CNS4107
+lab_prefix: CNS4107_CAT9K_ANSIBLE
+ntp_servers:
+  - 10.10.0.10
+  - 10.10.0.11
+syslog_servers:
+  - 10.10.0.50
+lab_loopbacks:
+  - name: Loopback150
+    description: CNS4107 Ansible lab loopback on Catalyst 9K - safe test
+    ip_address: 10.255.150.1
+    mask: 255.255.255.255
+lab_banner: |
+  ************************************************************
+  This device is used for CNS4107 Ansible automation practice.
+  Running on Catalyst 9000 Always-On Sandbox infrastructure.
+  Do not make disruptive changes on shared sandboxes.
+  ************************************************************
+EOF
+
+  195  ansible-playbook playbooks/00_preflight.yml
+  196  cat >> ansible.cfg <<'EOF'
+deprecation_warnings = False
+EOF
+
+  197  cat > playbooks/01_show_commands.yml <<'EOF'
+---
+- name: Run read-only show commands on IOS XE
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Run key operational commands
+      cisco.ios.ios_command:
+        commands:
+          - show version
+          - show ip interface brief
+          - show running-config | include ^hostname|^ntp|^ip domain
+      register: show_output
+
+    - name: Print output command by command
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ show_output.stdout_lines }}"
+EOF
+
+  198  ansible-playbook playbooks/01_show_commands.yml
+  199  cat > ansible.cfg <<'EOF'
+[defaults]
+inventory = inventories/devnet.yml
+host_key_checking = False
+retry_files_enabled = False
+timeout = 30
+stdout_callback = default
+result_format = yaml
+bin_ansible_callbacks = True
+interpreter_python = auto_silent
+collections_path = ~/.ansible/collections:/usr/share/ansible/collections
+deprecation_warnings = False
+
+[persistent_connection]
+connect_timeout = 60
+command_timeout = 60
+EOF
+
+  200  ansible-playbook playbooks/01_show_commands.yml
+  201  cat > playbooks/02_gather_facts.yml <<'EOF'
+---
+- name: Gather IOS XE facts and save them locally
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Gather minimum IOS facts
+      cisco.ios.ios_facts:
+        gather_subset:
+          - min
+      register: facts_result
+
+    - name: Create local output directory
+      ansible.builtin.file:
+        path: outputs
+        state: directory
+      delegate_to: localhost
+
+    - name: Save facts as formatted JSON
+      ansible.builtin.copy:
+        content: "{{ facts_result.ansible_facts | to_nice_json }}\n"
+        dest: "outputs/{{ inventory_hostname }}_facts.json"
+      delegate_to: localhost
+
+    - name: Show selected facts
+      ansible.builtin.debug:
+        msg:
+          - "hostname : {{ facts_result.ansible_facts.ansible_net_hostname | default('unknown') }}"
+          - "model    : {{ facts_result.ansible_facts.ansible_net_model | default('unknown') }}"
+          - "version  : {{ facts_result.ansible_facts.ansible_net_version | default('unknown') }}"
+          - "serial   : {{ facts_result.ansible_facts.ansible_net_serialnum | default('unknown') }}"
+EOF
+
+  202  ansible-playbook playbooks/02_gather_facts.yml
+  203  cat outputs/catalyst9k_facts.json | jq '.ansible_net_hostname, .ansible_net_version'
+  204  cat > playbooks/03_backup_running_config.yml <<'EOF'
+---
+- name: Backup running configuration from IOS XE
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Ensure backup directory exists
+      ansible.builtin.file:
+        path: backups
+        state: directory
+      delegate_to: localhost
+
+    - name: Backup running configuration using ios_config
+      cisco.ios.ios_config:
+        backup: true
+        backup_options:
+          dir_path: backups
+          filename: "{{ inventory_hostname }}_running.cfg"
+      register: backup_result
+
+    - name: Show backup location
+      ansible.builtin.debug:
+        var: backup_result.backup_path
+EOF
+
+  205  ansible-playbook playbooks/03_backup_running_config.yml
+  206  ls -l backups/
+  207  head -20 backups/catalyst9k_running.cfg
+  208  cat > templates/loopbacks.j2 <<'EOF'
+! ============================================================
+! Rendered by Ansible from templates/loopbacks.j2
+! Device : {{ inventory_hostname }}
+! Site   : {{ site | default('unknown') }}
+! Do not paste into production without review.
+! ============================================================
+!
+{% for lb in lab_loopbacks %}
+interface {{ lb.name }}
+ description {{ lb.description }}
+ ip address {{ lb.ip_address }} {{ lb.mask }}
+ no shutdown
+!
+{% endfor %}
+EOF
+
+  209  cat > templates/management_services.j2 <<'EOF'
+! Management services rendered from structured YAML data
+{% for server in ntp_servers | sort %}
+ntp server {{ server }}
+{% endfor %}
+!
+{% for server in syslog_servers | default([]) %}
+logging host {{ server }}
+{% endfor %}
+!
+banner motd ^
+{{ lab_banner }}
+^
+EOF
+
+  210  cat > playbooks/04_render_config_locally.yml <<'EOF'
+---
+- name: Render IOS XE configuration locally from Jinja2 templates
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Ensure rendered directory exists
+      ansible.builtin.file:
+        path: rendered
+        state: directory
+      delegate_to: localhost
+
+    - name: Render loopback configuration locally
+      ansible.builtin.template:
+        src: ../templates/loopbacks.j2
+        dest: "rendered/{{ inventory_hostname }}_loopbacks.cfg"
+      delegate_to: localhost
+
+    - name: Render management services configuration locally
+      ansible.builtin.template:
+        src: ../templates/management_services.j2
+        dest: "rendered/{{ inventory_hostname }}_management_services.cfg"
+      delegate_to: localhost
+
+    - name: Show where rendered files were created
+      ansible.builtin.debug:
+        msg:
+          - "rendered/{{ inventory_hostname }}_loopbacks.cfg"
+          - "rendered/{{ inventory_hostname }}_management_services.cfg"
+EOF
+
+  211  ansible-playbook playbooks/04_render_config_locally.yml
+  212  cat > playbooks/04_render_config_locally.yml <<'EOF'
+---
+- name: Render IOS XE configuration locally from Jinja2 templates
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+    lab_loopbacks:
+      - name: Loopback150
+        description: CNS4107 Ansible lab loopback on Catalyst 9K - safe test
+        ip_address: 10.255.150.1
+        mask: 255.255.255.255
+    ntp_servers:
+      - 10.10.0.10
+      - 10.10.0.11
+    syslog_servers:
+      - 10.10.0.50
+    lab_banner: |
+      ************************************************************
+      This device is used for CNS4107 Ansible automation practice.
+      Running on Catalyst 9000 Always-On Sandbox infrastructure.
+      Do not make disruptive changes on shared sandboxes.
+      ************************************************************
+  tasks:
+    - name: Ensure rendered directory exists
+      ansible.builtin.file:
+        path: rendered
+        state: directory
+      delegate_to: localhost
+
+    - name: Render loopback configuration locally
+      ansible.builtin.template:
+        src: ../templates/loopbacks.j2
+        dest: "rendered/{{ inventory_hostname }}_loopbacks.cfg"
+      delegate_to: localhost
+
+    - name: Render management services configuration locally
+      ansible.builtin.template:
+        src: ../templates/management_services.j2
+        dest: "rendered/{{ inventory_hostname }}_management_services.cfg"
+      delegate_to: localhost
+
+    - name: Show where rendered files were created
+      ansible.builtin.debug:
+        msg:
+          - "rendered/{{ inventory_hostname }}_loopbacks.cfg"
+          - "rendered/{{ inventory_hostname }}_management_services.cfg"
+EOF
+
+  213  ansible-playbook playbooks/04_render_config_locally.yml
+  214  cat rendered/catalyst9k_loopbacks.cfg
+  215  cat rendered/catalyst9k_management_services.cfg
+  216  cat > playbooks/05_check_mode_diff.yml <<'EOF'
+---
+- name: Dry-run rendered loopback configuration against IOS XE
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+    lab_loopbacks:
+      - name: Loopback150
+        description: CNS4107 Ansible lab loopback on Catalyst 9K - safe test
+        ip_address: 10.255.150.1
+        mask: 255.255.255.255
+  tasks:
+    - name: Ensure rendered config exists
+      ansible.builtin.template:
+        src: ../templates/loopbacks.j2
+        dest: "rendered/{{ inventory_hostname }}_loopbacks.cfg"
+      delegate_to: localhost
+
+    - name: Load rendered config in check mode
+      cisco.ios.ios_config:
+        src: "rendered/{{ inventory_hostname }}_loopbacks.cfg"
+        match: line
+        save_when: never
+      register: config_result
+
+    - name: Show Ansible result summary
+      ansible.builtin.debug:
+        var: config_result
+EOF
+
+  217  ansible-playbook playbooks/05_check_mode_diff.yml --check --diff
+  218  cat > playbooks/05_check_mode_diff.yml <<'EOF'
+---
+- name: Dry-run rendered loopback configuration against IOS XE
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+    lab_loopbacks:
+      - name: Loopback150
+        description: CNS4107 Ansible lab loopback on Catalyst 9K - safe test
+        ip_address: 10.255.150.1
+        mask: 255.255.255.255
+  tasks:
+    - name: Ensure rendered config exists
+      ansible.builtin.template:
+        src: ../templates/loopbacks.j2
+        dest: "rendered/{{ inventory_hostname }}_loopbacks.cfg"
+      delegate_to: localhost
+
+    - name: Read rendered config file
+      ansible.builtin.slurp:
+        src: "{{ playbook_dir }}/../rendered/{{ inventory_hostname }}_loopbacks.cfg"
+      register: rendered_config
+      delegate_to: localhost
+
+    - name: Load rendered config in check mode
+      cisco.ios.ios_config:
+        lines: "{{ (rendered_config.content | b64decode).split('\n') | select('match', '^[^!]') | list }}"
+        match: l
+exit
+EOF
+
+  219  ansible-playbook playbooks/05_check_mode_diff.yml --check --diff
+  220  cat > playbooks/05_check_mode_diff.yml <<'EOF'
+---
+- name: Dry-run rendered loopback configuration against IOS XE
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+    lab_loopbacks:
+      - name: Loopback150
+        description: CNS4107 Ansible lab loopback on Catalyst 9K - safe test
+        ip_address: 10.255.150.1
+        mask: 255.255.255.255
+  tasks:
+    - name: Ensure rendered config exists
+      ansible.builtin.template:
+        src: ../templates/loopbacks.j2
+        dest: "rendered/{{ inventory_hostname }}_loopbacks.cfg"
+      delegate_to: localhost
+
+    - name: Read rendered config file
+      ansible.builtin.slurp:
+        src: "{{ playbook_dir }}/../rendered/{{ inventory_hostname }}_loopbacks.cfg"
+      register: rendered_config
+      delegate_to: localhost
+
+    - name: Load rendered config in check mode
+      cisco.ios.ios_config:
+        lines: "{{ (rendered_config.content | b64decode).split('\n') | select('match', '^[^!]') | list }}"
+        match: line
+        save_when: never
+      register: config_result
+
+    - name: Show Ansible result summary
+      ansible.builtin.debug:
+        var: config_result
+EOF
+
+  221  ansible-playbook playbooks/05_check_mode_diff.yml --check --diff
+  222  cat > playbooks/07_resource_rendered_offline.yml <<'EOF'
+---
+- name: Render interface commands from structured data without touching the device
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Render IOS interface configuration from data model
+      cisco.ios.ios_interfaces:
+        config:
+          - name: Loopback150
+            description: CNS4107 resource module rendered example
+            enabled: true
+        state: rendered
+      register: rendered_interfaces
+
+    - name: Print rendered CLI commands
+      ansible.builtin.debug:
+        var: rendered_interfaces.rendered
+EOF
+
+  223  ansible-playbook playbooks/07_resource_rendered_offline.yml
+  224  cat > playbooks/08_resource_gathered_readonly.yml <<'EOF'
+---
+- name: Gather interface state as structured data
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+  tasks:
+    - name: Gather IOS interface resource state
+      cisco.ios.ios_interfaces:
+        state: gathered
+      register: gathered_interfaces
+
+    - name: Save gathered interface data as JSON
+      ansible.builtin.copy:
+        content: "{{ gathered_interfaces.gathered | to_nice_json }}\n"
+        dest: "outputs/{{ inventory_hostname }}_interfaces_gathered.json"
+      delegate_to: localhost
+
+    - name: Print first few gathered interface records
+      ansible.builtin.debug:
+        msg: "{{ gathered_interfaces.gathered[:5] }}"
+EOF
+
+  225  ansible-playbook playbooks/08_resource_gathered_readonly.yml
+  226  cat outputs/catalyst9k_interfaces_gathered.json | jq '.[0:3]'
+  227  cat > templates/device_report.md.j2 <<'EOF'
+# Device Report: {{ inventory_hostname }}
+
+| Field | Value |
+|---|---|
+| Inventory host | {{ inventory_hostname }} |
+| Management host | {{ ansible_host }} |
+| Site | {{ site | default('unknown') }} |
+| Role | {{ device_role | default('unknown') }} |
+| Course | {{ report_tags.course | default('unknown') }} |
+| Lab | {{ report_tags.lab | default('unknown') }} |
+
+## Lab Intent
+
+Configured loopback intent:
+{% for lb in lab_loopbacks %}
+- {{ lb.name }}: {{ lb.ip_address }}/32 - {{ lb.description }}
+{% endfor %}
+
+NTP servers:
+{% for server in ntp_servers %}
+- {{ server }}
+{% endfor %}
+
+Generated by Ansible from structured YAML data.
+EOF
+
+  228  cat > playbooks/09_generate_report.yml <<'EOF'
+---
+- name: Generate local Markdown report from inventory and variables
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+    lab_loopbacks:
+      - name: Loopback150
+        description: CNS4107 Ansible lab loopback on Catalyst 9K - safe test
+        ip_address: 10.255.150.1
+        mask: 255.255.255.255
+    ntp_servers:
+      - 10.10.0.10
+      - 10.10.0.11
+    report_tags:
+      course: CNS4107
+      lab: ansible-wsl-devnet
+      environment: devnet-catalyst9k
+  tasks:
+    - name: Ensure reports directory exists
+      ansible.builtin.file:
+        path: reports
+        state: directory
+      delegate_to: localhost
+
+    - name: Render Markdown device report
+      ansible.builtin.template:
+        src: ../templates/device_report.md.j2
+        dest: "reports/{{ inventory_hostname }}_report.md"
+      delegate_to: localhost
+
+    - name: Show report file path
+      ansible.builtin.debug:
+        msg: "reports/{{ inventory_hostname }}_report.md"
+EOF
+
+  229  ansible-playbook playbooks/09_generate_report.yml
+  230  cat reports/catalyst9k_report.md
+  231  cd ~/cns4107
+  232  zip -r ansible-wsl-devnet-lab.zip ansible-wsl-devnet-lab/
+  233  sudo apt install zip -y
+  234  zip -r ansible-wsl-devnet-lab.zip ansible-wsl-devnet-lab/
+  235  sudo apt install zip -y
+  236  zip -r ansible-wsl-devnet-lab.zip ansible-wsl-devnet-lab/
+  237  cd ~/cns4107
+  238  zip -r ansible-wsl-devnet-lab-clean.zip ansible-wsl-devnet-lab/   --exclude "ansible-wsl-devnet-lab/.venv/*"   --exclude "ansible-wsl-devnet-lab/venv/*"   --exclude "ansible-wsl-devnet-lab/__pycache__/*"
+  239  ls -lh ansible-wsl-devnet-lab*.zip
+  240  history > ~/cns4107/ansible-wsl-devnet-lab/command_history.txt

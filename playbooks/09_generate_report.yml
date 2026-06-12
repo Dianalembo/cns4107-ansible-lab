@@ -1,0 +1,37 @@
+---
+- name: Generate local Markdown report from inventory and variables
+  hosts: iosxe
+  gather_facts: false
+  vars:
+    ansible_connection: ansible.netcommon.network_cli
+    ansible_network_os: cisco.ios.ios
+    ansible_become: true
+    ansible_become_method: enable
+    lab_loopbacks:
+      - name: Loopback150
+        description: CNS4107 Ansible lab loopback on Catalyst 9K - safe test
+        ip_address: 10.255.150.1
+        mask: 255.255.255.255
+    ntp_servers:
+      - 10.10.0.10
+      - 10.10.0.11
+    report_tags:
+      course: CNS4107
+      lab: ansible-wsl-devnet
+      environment: devnet-catalyst9k
+  tasks:
+    - name: Ensure reports directory exists
+      ansible.builtin.file:
+        path: reports
+        state: directory
+      delegate_to: localhost
+
+    - name: Render Markdown device report
+      ansible.builtin.template:
+        src: ../templates/device_report.md.j2
+        dest: "reports/{{ inventory_hostname }}_report.md"
+      delegate_to: localhost
+
+    - name: Show report file path
+      ansible.builtin.debug:
+        msg: "reports/{{ inventory_hostname }}_report.md"

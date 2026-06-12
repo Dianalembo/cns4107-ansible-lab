@@ -1,0 +1,13 @@
+---
+all:
+  children:
+    iosxe:
+      hosts:
+        catalyst9k:
+          ansible_host: devnetsandboxiosxec9k.cisco.com
+          ansible_port: 22
+          ansible_user: rehema.lembo
+          ansible_password: wPULJ_-0ir66t
+          ansible_become_password: wPULJ_-0ir66t
+          device_role: lab_switch
+          site: strathmore_lab

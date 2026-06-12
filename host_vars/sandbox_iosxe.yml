@@ -1,0 +1,10 @@
+---
+ansible_hostname_expected: sandbox-iosxe.cisco.com
+management_protocols:
+  ssh: 22
+  netconf: 830
+  restconf: 443
+report_tags:
+  course: CNS4107
+  lab: ansible-wsl-devnet
+  environment: catalyst-9k-sandbox
