@@ -1,73 +1,58 @@
-# CNS 4107 Network Automation – Ansible WSL DevNet Lab
-**Student:** Rehema Lembo  
-**Course:** CNS 4107 Network Automation  
-**Institution:** Strathmore University  
+# Ansible WSL DevNet Lab
+**Rehema Lembo  168297  
 **Date:** June 12, 2026  
 
----
 
-## Overview
-This lab demonstrates network automation using Ansible running on Windows Subsystem for Linux (WSL) connected to a Cisco Catalyst 9000 Always-On DevNet Sandbox running IOS XE 17.15.1.
-
----
+This lab demonstrates network automation using Ansible running on Windows Subsystem for Linux (WSL) connected to a Cisco Catalyst 9000 Always-On DevNet Sandbox 
 
 ## Environment
-| Item | Detail |
-|---|---|
 | Control Node | Ubuntu 24.04 on WSL2 |
-| Ansible Version | core 2.21.0 |
-| Python Version | 3.12.3 |
-| Target Device | Cisco Catalyst 9000 (C9KV-UADP-8P) |
-| IOS XE Version | 17.15.1 |
-| Sandbox | Cisco DevNet Always-On Catalyst 9000 |
-| Collections | cisco.ios, ansible.netcommon, community.general |
 
----
+the device that was target is Cisco Catalyst 9000 (C9KV-UADP-8P) running IOS XE Version | 
 
-## What Was Done
+## lab flow
+###  WSL and Ansible Setup
+- we Installed Ubuntu 24.04 on WSL2 using PowerShell
+- we Created a Python virtual environment under `~/cns4107/ansible-wsl-devnet-lab`
+- we Installed dependencies
+- we Installed cisco.ios, ansible.netcommon, and community.general collections
 
-### Part A – WSL and Ansible Setup
-- Installed Ubuntu 24.04 on WSL2 via PowerShell
-- Created a Python virtual environment under `~/cns4107/ansible-wsl-devnet-lab`
-- Installed ansible-core 2.21.0 and dependencies
-- Installed cisco.ios, ansible.netcommon, and community.general collections
+### Project Structure
+- we Created all required project folders: inventories, group_vars, host_vars, templates, playbooks, outputs, backups, rendered, reports
+- we Created ansible.cfg, requirements.txt, and collections/requirements.yml
 
-### Part B – Project Structure
-- Created all required project folders: inventories, group_vars, host_vars, templates, playbooks, outputs, backups, rendered, reports
-- Created ansible.cfg, requirements.txt, and collections/requirements.yml
-
-### Part C – Inventory and Variables
+### Inventory and Variables
 - Created YAML inventory pointing to the Catalyst 9000 DevNet sandbox
 - Created group_vars/iosxe.yml with connection variables, NTP servers, syslog servers, loopback intent, and banner
 - Created host_vars/catalyst9k.yml with host-specific metadata and report tags
 - Validated inventory with ansible-inventory --graph
 
-### Part D – Connectivity Testing
+### Connectivity Testing
 - Confirmed DNS resolution and TCP port 22 reachability
 - Ran manual SSH test to the Catalyst 9000
 - Successfully ran first Ansible ad hoc commands using cisco.ios.ios_command
 
-### Part E – Playbooks, Facts and Backups
+### Playbooks, Facts and Backups
 - **00_preflight.yml:** Verified inventory variables and retrieved device clock
 - **01_show_commands.yml:** Retrieved show version, show ip interface brief, and filtered running config
 - **02_gather_facts.yml:** Gathered structured facts and saved to outputs/catalyst9k_facts.json
 - **03_backup_running_config.yml:** Backed up 19KB running configuration to backups/catalyst9k_running.cfg
 
-### Part F – Jinja2 Templating
+### Jinja2 Templating
 - Created loopbacks.j2 template using for loops and variables
 - Created management_services.j2 template for NTP, syslog, and banner
 - Rendered both templates locally using 04_render_config_locally.yml
 - Verified rendered IOS XE CLI output before any deployment
 
-### Part G – Dry-Run Deployment
+### Dry-Run Deployment
 - Created 05_check_mode_diff.yml to test configuration against the device
 - Ran playbook with --check --diff flags to preview changes safely
 
-### Part H – Resource Modules
+### Resource Modules
 - **07_resource_rendered_offline.yml:** Used cisco.ios.ios_interfaces in rendered state to generate CLI from structured YAML without connecting to the device
 - **08_resource_gathered_readonly.yml:** Used gathered state to collect current interface state as structured JSON, saved to outputs/catalyst9k_interfaces_gathered.json
 
-### Part I – Report Generation
+### Report Generation
 - Created device_report.md.j2 Jinja2 template
 - Generated reports/catalyst9k_report.md from inventory and variable data
 
